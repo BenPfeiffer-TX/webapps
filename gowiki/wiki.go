@@ -1,16 +1,31 @@
 package main
 
 import (
+	"errors"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 // each page in our wiki will have a title and a body
 type Page struct {
 	Title string
 	Body  []byte
+}
+
+var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+
+// this function validates the web path when accessing a page
+func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
+	m := validPath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.NotFound(w, r)
+		return "", errors.New("invalid Page Title")
+	}
+	return m[2], nil
 }
 
 // this method addresses persistent storage of our Pages
@@ -31,12 +46,7 @@ func loadPage(title string) (*Page, error) {
 
 // this function executes arbitrary templates to our responsewriter
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, err := template.ParseFiles(tmpl + ".html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = t.Execute(w, p)
+	err := templates.ExecuteTemplate(w, tmpl+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -44,8 +54,10 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 
 // this handler allows us to view a wiki page, will handle URLs prefixed with "/view/"
 func viewHandler(w http.ResponseWriter, r *http.Request) {
-	//todo error handling for loadPage call
-	title := r.URL.Path[len("/view/"):]
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
 	p, err := loadPage(title)
 	if err != nil {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
@@ -56,7 +68,10 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 // this handler allows editing existing or new wiki pages
 func editHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/edit/"):]
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
 	p, err := loadPage(title)
 	if err != nil {
 		p = &Page{Title: title}
@@ -66,7 +81,10 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 // this handler is for saving edits and new pages to the filesystem
 func saveHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/save/"):]
+	title, err := getTitle(w, r)
+	if err != nil {
+		return
+	}
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
 
