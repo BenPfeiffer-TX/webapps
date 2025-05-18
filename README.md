@@ -20,9 +20,10 @@ Through building this application, I gained hands-on experience with:
 ### Features ✨
 -----
 
-*   Create new wiki entries 📝
-*   Edit existing wiki entries ✍️
-*   Delete unwanted wiki entries 🚮
+* Create new wiki entries 📝
+* Edit existing wiki entries ✍️
+* Delete unwanted wiki entries 🚮
+* Redirect to a home page 🏠  
 
 ### TODO list of features
 -----
