@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/BenPfeiffer-TX/webapps/gowiki/logtest"
 )
 
 // each page in our wiki will have a title and a body
@@ -103,6 +105,6 @@ func main() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
-	Logoutput("now running web server")
+	logtest.Logoutput("now running web server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
