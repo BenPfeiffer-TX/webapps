@@ -40,7 +40,7 @@ To run the application, simply execute:
 ```bash
 git clone https://github.com/BenPfeiffer-TX/webapps
 cd webapps/gowiki
-go build wiki.go && ./wiki
+go build . && ./wiki
 ```
 
 Then, navigate to `http://localhost:8080` in your web browser to access the wiki editor 🔗.

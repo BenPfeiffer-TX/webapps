@@ -18,7 +18,7 @@ type Page struct {
 }
 
 var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(edit|save|view|delete)/([a-zA-Z0-9]+)$")
 
 // this function validates the web path when accessing a page
 // this is made obsolete by our handler function, makeHandler
@@ -49,6 +49,12 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
 	return os.WriteFile("data/"+filename, p.Body, 0600)
+}
+
+// this method addresses deleting existing files
+func (p *Page) dele() error {
+	filename := p.Title + ".txt"
+	return os.Remove("data/" + filename)
 }
 
 // this method is for loading a page from a file
@@ -101,10 +107,30 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
+// this handler is for deleting existing pages
+func deleHandler(w http.ResponseWriter, r *http.Request, title string) {
+	logtest.Logoutput("someone is trying to delete a page")
+	p, err := loadPage(title)
+	if err != nil {
+		//page already doesnt exist
+		http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+		return
+	}
+
+	err = p.dele()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+
+}
+
 func main() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
+	http.HandleFunc("/delete/", makeHandler(deleHandler))
 	logtest.Logoutput("now running web server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
