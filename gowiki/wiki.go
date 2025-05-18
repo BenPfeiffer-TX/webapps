@@ -17,8 +17,8 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view|delete)/([a-zA-Z0-9]+)$")
+var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html", "template/FrontPage.html"))
+var validPath = regexp.MustCompile("^/(edit|save|view|delete|home)/([a-zA-Z0-9]+)$")
 
 // this function validates the web path when accessing a page
 // this is made obsolete by our handler function, makeHandler
@@ -113,7 +113,7 @@ func deleHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
 		//page already doesnt exist
-		http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return
 	}
 
@@ -122,8 +122,13 @@ func deleHandler(w http.ResponseWriter, r *http.Request, title string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 
+}
+
+// this handler is responsible for displaying the front page
+func homeHandler(w http.ResponseWriter, r *http.Request, _ string) {
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func main() {
@@ -131,6 +136,14 @@ func main() {
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
 	http.HandleFunc("/delete/", makeHandler(deleHandler))
+	//	http.HandleFunc("/home/", makeHandler(homeHandler))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		renderTemplate(w, "FrontPage", nil)
+	})
 	logtest.Logoutput("now running web server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
