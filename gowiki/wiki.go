@@ -48,13 +48,13 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 // this method addresses persistent storage of our Pages
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
-	return os.WriteFile(filename, p.Body, 0600)
+	return os.WriteFile("data/"+filename, p.Body, 0600)
 }
 
 // this method is for loading a page from a file
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
-	body, err := os.ReadFile(filename)
+	body, err := os.ReadFile("data/" + filename)
 	if err != nil {
 		return nil, err
 	}
