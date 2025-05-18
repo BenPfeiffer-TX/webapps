@@ -26,6 +26,7 @@ Through building this application, I gained hands-on experience with:
 
 ### TODO list of features
 -----
+* create a logging sub package (track user actions, write to log file, roll over log after X size)
 * implement delete functionality
 * Store templates in tmpl/ and page data in data/.
 * Add a handler to make the web root redirect to /view/FrontPage.
