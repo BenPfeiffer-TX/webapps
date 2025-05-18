@@ -19,6 +19,7 @@ var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 // this function validates the web path when accessing a page
+// this is made obsolete by our handler function, makeHandler
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 	m := validPath.FindStringSubmatch(r.URL.Path)
 	if m == nil {
@@ -26,6 +27,20 @@ func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 		return "", errors.New("invalid Page Title")
 	}
 	return m[2], nil
+}
+
+// this function wraps the handler calls, performing a validation as getTitle()
+// but without requiring duplicate code in each handler func
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Here we will extract the page title from the Request and call the provided handler 'fn'
+		m := validPath.FindStringSubmatch(r.URL.Path)
+		if m == nil {
+			http.NotFound(w, r)
+			return
+		}
+		fn(w, r, m[2])
+	}
 }
 
 // this method addresses persistent storage of our Pages
@@ -53,11 +68,7 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 // this handler allows us to view a wiki page, will handle URLs prefixed with "/view/"
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
+func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
@@ -67,11 +78,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // this handler allows editing existing or new wiki pages
-func editHandler(w http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
+func editHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
 		p = &Page{Title: title}
@@ -80,11 +87,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // this handler is for saving edits and new pages to the filesystem
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(w, r)
-	if err != nil {
-		return
-	}
+func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
 
@@ -97,11 +100,8 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	//p1 := &Page{Title: "TestPage1", Body: []byte("this is an example")}
-	//p1.save()
-	//p2, _ := loadPage("TestPage1")
-	http.HandleFunc("/view/", viewHandler)
-	http.HandleFunc("/edit/", editHandler)
-	http.HandleFunc("/save/", saveHandler)
+	http.HandleFunc("/view/", makeHandler(viewHandler))
+	http.HandleFunc("/edit/", makeHandler(editHandler))
+	http.HandleFunc("/save/", makeHandler(saveHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
