@@ -38,6 +38,8 @@ Through building this application, I gained hands-on experience with:
 To run the application, simply execute:
 
 ```bash
+git clone https://github.com/BenPfeiffer-TX/webapps
+cd webapps/gowiki
 go build wiki.go && ./wiki
 ```
 
