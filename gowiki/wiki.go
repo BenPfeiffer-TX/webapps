@@ -17,7 +17,7 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html", "template/FrontPage.html"))
+var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html", "template/home.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view|delete|home)/([a-zA-Z0-9]+)$")
 
 // this function validates the web path when accessing a page
@@ -142,7 +142,7 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		renderTemplate(w, "FrontPage", nil)
+		renderTemplate(w, "home", nil)
 	})
 	logtest.Logoutput("now running web server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
