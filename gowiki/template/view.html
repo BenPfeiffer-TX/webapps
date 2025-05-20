@@ -4,16 +4,103 @@
     <meta charset="UTF-8">
     <title>Edit Page</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .sidebar {
+            width: 200px;
+            background-color: #5cb85c; /* Match the green of the save button */
+            padding: 15px;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .sidebar a:hover {
+            background-color: #4cae4c; /* Darker shade of green for hover effect */
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        p {
+            font-size: 18px;
+        }
+
+        .button-container {
+            display: flex; /* Use flexbox to align buttons side by side */
+            gap: 10px; /* Add space between buttons */
+            margin-top: 20px;
+        }
+
+        button.edit-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #5cb85c; /* Green for Edit button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        button.delete-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #dc3545; /* Red for Delete button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        button:hover {
+            background-color: #4cae4c; /* Darker shade of green for hover effect on Edit button */
+        }
+
+        .delete-button:hover {
+            background-color: #bd2130; /* Darker shade of red for hover effect on Delete button */
+        }
+    </style>
 </head>
 <body>
 
-<h1>{{.Title}}</h1>
+<div class="sidebar">
+    <h2>Navigation</h2>
+    <p><a href="/">Home</a></p>
+</div>
 
-<p>[<a href="/edit/{{.Title}}">edit</a>]</p>
-<p>[<a href="/delete/{{.Title}}">delete</a>]</p>
-<div>{{printf "%s" .Body}}</div>
-<p>[<a href="/">home</a>]</p>
+<div class="main-content">
+    <h1>{{.Title}}</h1>
 
+    <div>{{printf "%s" .Body}}</div>
+
+    <div class="button-container">
+        <button class="edit-button"><a href="/edit/{{.Title}}">Edit</a></button>
+        <button class="delete-button"><a href="/delete/{{.Title}}">Delete</a></button>
+    </div>
+</div>
 
 </body>
 </html>
