@@ -18,7 +18,7 @@ type Page struct {
 }
 
 var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html", "template/home.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view|delete|home)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(edit|save|view|delete|home|static)/([a-zA-Z0-9]+)$")
 
 // this function validates the web path when accessing a page
 // this is made obsolete by our handler function, makeHandler
@@ -132,11 +132,14 @@ func homeHandler(w http.ResponseWriter, r *http.Request, _ string) {
 }
 
 func main() {
+	staticDir := http.Dir("./static")
+	fs := http.FileServer(staticDir)
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
 	http.HandleFunc("/delete/", makeHandler(deleHandler))
-	//	http.HandleFunc("/home/", makeHandler(homeHandler))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -144,6 +147,7 @@ func main() {
 		}
 		renderTemplate(w, "home", nil)
 	})
+
 	logtest.Logoutput("now running web server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
