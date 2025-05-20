@@ -1,0 +1,7 @@
+INFO: 2025/05/20 16:54:33 wiki.go:153: ----------
+INFO: 2025/05/20 16:54:33 wiki.go:154: starting web server...
+INFO: 2025/05/20 16:54:42 wiki.go:83: [::1]:56716 viewed test
+INFO: 2025/05/20 16:54:46 wiki.go:93: [::1]:56716 edited logging
+INFO: 2025/05/20 16:54:50 wiki.go:107: [::1]:56716 created logging
+INFO: 2025/05/20 16:54:50 wiki.go:83: [::1]:56716 viewed logging
+INFO: 2025/05/20 16:54:51 wiki.go:125: [::1]:56716 deleted logging
