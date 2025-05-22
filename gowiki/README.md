@@ -9,9 +9,8 @@ providing a basic CRUD (Create, Read, Update, Delete) interface for managing con
 
 Through building this application, I gained hands-on experience with:
 
-*   **HTTP ResponseWriters**: Writing responses back to the client using `http.ResponseWriter` 📨.
-*   **HTTP Handlers**: Defining functions that handle HTTP requests and respond accordingly ⚙️.
-*   **Function Literals**: Using anonymous functions to implement simple logic within handlers 🔩.
+*   **HTTP Servers**: Creating handlers for HTTP requests and managing HTML template rendering 🖥.
+*   **Simple User Activity Logging**: Setting up a log file to track user activity based on IP 🕵️.
 *   **Basic HTML Formatting**: Rendering simple HTML templates for displaying data 💻.
 
 ## Features ✨
@@ -20,7 +19,9 @@ Through building this application, I gained hands-on experience with:
 * Create new wiki entries 📝
 * Edit existing wiki entries ✍️
 * Delete unwanted wiki entries 🚮
-* Redirect to a home page 🏠  
+* Redirect to a home page 🏠 
+* Dynamic linking to entries
+* CSS styling for web pages 
 
 
 ## Running the Application 🎉
