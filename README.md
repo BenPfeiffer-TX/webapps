@@ -5,4 +5,6 @@ In this public github repo I am storing my attempts at developing web applicatio
 [gowiki folder](gowiki)
 
 ## Project \#2: idk yet
-an "at a glance" attendance viewer for the OpenText technical support team to track availability / current status of people more readily than when checking Teams
+* an "at a glance" attendance viewer for the OpenText technical support team to track availability / current status of people more readily than when checking Teams
+* A chatroom with session persistence, a simple authentication page, JSON marshalling for storing credentials, and chat persistence
+
