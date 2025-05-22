@@ -22,9 +22,6 @@ Through building this application, I gained hands-on experience with:
 * Delete unwanted wiki entries 🚮
 * Redirect to a home page 🏠  
 
-## TODO list of features
------
-* Implement inter-page linking by converting instances of [PageName] to <a href="/view/PageName">PageName</a>. (hint: you could use regexp.ReplaceAllFunc to do this)
 
 ## Running the Application 🎉
 ------------------------
