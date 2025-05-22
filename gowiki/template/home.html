@@ -10,6 +10,11 @@
 
 <div>this is the front page</div>
 
-
+<h2>List of current wiki pages</h2>
+<ul>
+	{{range $.Files}}
+	<li><a href="/view/{{.}}">{{.}}</a></li>
+	{{end}}
+</ul>
 </body>
 </html>

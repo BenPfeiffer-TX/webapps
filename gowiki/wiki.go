@@ -3,10 +3,13 @@ package main
 import (
 	"errors"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 // each page in our wiki will have a title and a body
@@ -16,7 +19,7 @@ type Page struct {
 }
 
 var templates = template.Must(template.ParseFiles("template/edit.html", "template/view.html", "template/home.html"))
-var validPath = regexp.MustCompile("^/(edit|save|view|delete|home|static)/([a-zA-Z0-9_-]+)$")
+var validPath = regexp.MustCompile("^/(edit|save|view|delete|home|static)/([a-zA-Z0-9_-]+)$|^/$")
 
 // this function validates the web path when accessing a page
 // this is made obsolete by our handler function, makeHandler
@@ -130,7 +133,20 @@ func deleHandler(l *log.Logger, w http.ResponseWriter, r *http.Request, title st
 // this handler is responsible for displaying the front page
 func homeHandler(l *log.Logger, w http.ResponseWriter, r *http.Request, _ string) {
 	l.Println(remoteIP(r) + " was redirected to home")
-	http.Redirect(w, r, "/", http.StatusFound)
+	files := getPageList()
+	//need to encapsulate files into a struct to be parsed by html template
+	data := struct{ Files []string }{Files: files}
+
+	err := templates.ExecuteTemplate(w, "home.html", data)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	//	renderTemplate(w, "home", data)
+	//	renderTemplate only accepts a *Page input for the data,
+	//
+	// so we manually call templates.ExecuteTemplate for homeHandler
 }
 
 // this function is for determining the users IP address
@@ -141,6 +157,21 @@ func remoteIP(r *http.Request) string {
 	}
 	ip := r.RemoteAddr
 	return ip
+}
+
+// this function is for getting a listing of the current pagesi
+// will return empty string slice if ReadDir errors
+func getPageList() []string {
+	files, err := ioutil.ReadDir("data/")
+	fileNames := make([]string, len(files))
+	if err != nil {
+		return fileNames
+	}
+	for i, file := range files {
+		//need to trim file extension off of entries in list
+		fileNames[i] = strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+	}
+	return fileNames
 }
 
 func main() {
@@ -161,13 +192,15 @@ func main() {
 	http.HandleFunc("/edit/", makeHandler(editHandler, logger))
 	http.HandleFunc("/save/", makeHandler(saveHandler, logger))
 	http.HandleFunc("/delete/", makeHandler(deleHandler, logger))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		renderTemplate(w, "home", nil)
-	})
-
+	http.HandleFunc("/", makeHandler(homeHandler, logger))
+	/*
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/" {
+				http.NotFound(w, r)
+				return
+			}
+			renderTemplate(w, "home", nil)
+		})
+	*/
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
