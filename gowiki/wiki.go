@@ -69,8 +69,8 @@ func loadPage(title string) (*Page, error) {
 }
 
 // this function executes arbitrary templates to our responsewriter
-func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	err := templates.ExecuteTemplate(w, tmpl+".html", p)
+func renderTemplate(w http.ResponseWriter, tmpl string, data any) {
+	err := templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -136,17 +136,7 @@ func homeHandler(l *log.Logger, w http.ResponseWriter, r *http.Request, _ string
 	files := getPageList()
 	//need to encapsulate files into a struct to be parsed by html template
 	data := struct{ Files []string }{Files: files}
-
-	err := templates.ExecuteTemplate(w, "home.html", data)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	//	renderTemplate(w, "home", data)
-	//	renderTemplate only accepts a *Page input for the data,
-	//
-	// so we manually call templates.ExecuteTemplate for homeHandler
+	renderTemplate(w, "home", data)
 }
 
 // this function is for determining the users IP address
@@ -155,8 +145,7 @@ func remoteIP(r *http.Request) string {
 	if xForwardedFor != "" {
 		return xForwardedFor
 	}
-	ip := r.RemoteAddr
-	return ip
+	return r.RemoteAddr
 }
 
 // this function is for getting a listing of the current pagesi
@@ -193,14 +182,5 @@ func main() {
 	http.HandleFunc("/save/", makeHandler(saveHandler, logger))
 	http.HandleFunc("/delete/", makeHandler(deleHandler, logger))
 	http.HandleFunc("/", makeHandler(homeHandler, logger))
-	/*
-		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/" {
-				http.NotFound(w, r)
-				return
-			}
-			renderTemplate(w, "home", nil)
-		})
-	*/
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
