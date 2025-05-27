@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="1">
+    <meta http-equiv="refresh" content="5">
     <title>Presence</title>
-    <style>
-        .user-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Team Statuses</h1>
-    <div id="users">
+    <h1>Presence: The Team Status Tracker</h1>
+    
+    <div class="button-container">
+        <button onclick="location.href='/create/'">Create User</button>
+        <button onclick="location.href='/delete/'">Delete User</button>
+    </div>
+    
+    <div id="info" class="grid-container">
         {{range .StatusMap}}
-        <div class="user-box">
-            <strong>Name:</strong> {{.Name}}<br>
-            <strong>Status:</strong> {{.Status}}
+        <div class="status-box">
+            <h3>{{.Name}}</h3>
+            <p>Status: {{.Status}}</p>
         </div>
         {{end}}
     </div>

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var templates = template.Must(template.ParseFiles("static/index.html"))
+var templates = template.Must(template.ParseFiles("static/index.html", "static/create.html", "static/delete.html"))
 
 type StatusMap struct {
 	Name   string
@@ -44,11 +44,68 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createHandler(w http.ResponseWriter, r *http.Request) {
+	//display create.html, which contains a text box for a name and a 'submit' button
+	statusArr, _ := getStatus()
+	data := map[string][]StatusMap{"StatusMap": statusArr}
+	err := templates.ExecuteTemplate(w, "create.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("name")
+	//can implement name restrictions here, or in create.html template
+	newEntry := StatusMap{Name: name, Status: "Available"}
+
+	file, err := os.OpenFile("status.json", os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	var statusArray []StatusMap
+	//decode the existing JSON array
+	if err = json.NewDecoder(file).Decode(&statusArray); err == nil && !os.IsNotExist(err) {
+		//if successful, append new entry
+		statusArray = append(statusArray, newEntry)
+		//now we clear old contents of status.json
+		err = os.Truncate(file.Name(), 0)
+		file.Close()
+		if err != nil {
+			//for some reason truncate errored
+			fmt.Printf("Failed to truncate file: %v\n", err)
+			return
+		}
+	} else {
+		//if there is error or file doesnt exist, start with new array
+		fmt.Printf("Warning: could not decode existing status.json: %v\n", err)
+		statusArray = []StatusMap{newEntry}
+	}
+	file, err = os.OpenFile("status.json", os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+	//encode new data to status.json
+	if err = json.NewEncoder(file).Encode(statusArray); err != nil {
+		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
-
+	//display delete.html, which displays boxes of usernames and, when clicked, they are removed from list
+	statusArr, _ := getStatus()
+	data := map[string][]StatusMap{"StatusMap": statusArr}
+	err := templates.ExecuteTemplate(w, "delete.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,11 +116,12 @@ func main() {
 	staticDir := http.Dir("./static")
 	fs := http.FileServer(staticDir)
 
-	http.Handle("/static", http.StripPrefix("/static/", fs))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", mainHandler)
 	http.HandleFunc("/create/", createHandler)
 	http.HandleFunc("/delete/", deleteHandler)
 	http.HandleFunc("/update/", updateHandler)
+	http.HandleFunc("/save/", saveHandler)
 
 	log.Fatal(http.ListenAndServe(":8888", nil))
 }
