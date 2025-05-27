@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="1">
+    <title>Presence</title>
+    <style>
+        .user-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Team Statuses</h1>
+    <div id="users">
+        {{range .StatusMap}}
+        <div class="user-box">
+            <strong>Name:</strong> {{.Name}}<br>
+            <strong>Status:</strong> {{.Status}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>
