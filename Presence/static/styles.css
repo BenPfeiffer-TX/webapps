@@ -35,6 +35,9 @@
 	.status-box.away {
 		background-color:#f3b229;
 	}
+	.status-box.lunch {
+		background-color:#D29A24;
+	}
 	.status-box.meeting {
 		background-color: #6a216a;
 	}

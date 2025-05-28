@@ -29,5 +29,5 @@ cd webapps/Presence
 go build . && ./main
 ```
 
-Then, navigate to `http://localhost:8888` in your web browser to access the status board 🔗.
+Then, navigate to `http://localhost:8080` in your web browser to access the status board 🔗.
 
