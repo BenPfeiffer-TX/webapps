@@ -94,10 +94,19 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeHandler(w http.ResponseWriter, r *http.Request) {
-	//name := r.FormValue("name")
-	//statusArray := getStatus()
-	//...
-
+	name := r.FormValue("name")
+	currentArray := getStatus()
+	var newArray []StatusMap
+	//iterate through statusArray, adding each entry except match on 'name' to newArray
+	for _, user := range currentArray {
+		if user.Name != name {
+			newArray = append(newArray, user)
+		}
+	}
+	err := putStatus(newArray)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
@@ -110,11 +119,13 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//we load the current statusArray and iterate through it until we match on the user we are updating
 	currentArray := getStatus()
-	for _, user := range currentArray {
+	fmt.Println(currentArray)
+	for i, user := range currentArray {
 		if user.Name == newEntry.Name {
-			user.Status = newEntry.Status
+			currentArray[i].Status = newEntry.Status
 		}
 	}
+	fmt.Println(currentArray)
 	//push updated array content to json
 	err = putStatus(currentArray)
 	if err != nil {
