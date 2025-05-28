@@ -119,13 +119,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//we load the current statusArray and iterate through it until we match on the user we are updating
 	currentArray := getStatus()
-	fmt.Println(currentArray)
 	for i, user := range currentArray {
 		if user.Name == newEntry.Name {
 			currentArray[i].Status = newEntry.Status
 		}
 	}
-	fmt.Println(currentArray)
 	//push updated array content to json
 	err = putStatus(currentArray)
 	if err != nil {

@@ -16,7 +16,7 @@
     
     <div id="info" class="grid-container">
         {{range .StatusMap}}
-	<div class="status-box {{if eq .Status "Available"}}available{{else if eq .Status "Busy"}}busy{{else if eq .Status "Away"}}away{{else if eq .Status "Offline"}}offline{{end}}">
+	<div class="status-box {{if eq .Status "Available"}}available{{else if eq .Status "Busy"}}busy{{else if eq .Status "Away"}}away{{else if eq .Status "Meeting"}}meeting{{else if eq .Status "Offline"}}offline{{end}}">
             <h3>{{.Name}}</h3>
             <p>Status: {{.Status}}</p>
 	    <select onchange="updateStatus('{{.Name}}', this.value)">

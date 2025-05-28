@@ -27,16 +27,16 @@
             cursor: pointer;
         }
 	.status-box.available {
-		background-color: green;
+		background-color: #84bf41;
 	}
 	.status-box.busy {
-		background-color: red;
+		background-color: #db322a;
 	}
 	.status-box.away {
-		background-color:yellow;
+		background-color:#f3b229;
 	}
 	.status-box.meeting {
-		background-color: darkred;
+		background-color: #6a216a;
 	}
 	.status-box.offline {
 		background-color: grey;

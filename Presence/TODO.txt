@@ -1,9 +1,0 @@
-X learn JSON marshalling and unmarshalling
-
-X implement struct that maps to persistent JSON file which will hold user + their status
-
-X,X,_ implement functions to create users, delete users, update their status (check if status is valid)
-
-X update index.html to display users + status
-
-update index.html to allow interacting with user status
