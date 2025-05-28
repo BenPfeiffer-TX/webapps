@@ -87,8 +87,8 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeHandler(w http.ResponseWriter, r *http.Request) {
-	//name := r.FormValue("name")
-	//statusArray := getStatus()
+	name := r.FormValue("name")
+	statusArray := getStatus()
 	//...
 
 	http.Redirect(w, r, "/", http.StatusFound)
