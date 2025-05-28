@@ -58,28 +58,31 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	//can implement name restrictions here, or in create.html template
 	newEntry := StatusMap{Name: name, Status: "Available"}
 
-	//read the contents of status.json
-	statusArray, err := getStatus()
+	file, err := os.OpenFile("status.json", os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
-		//failed to get status so we make a new array
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	var statusArray []StatusMap
+	//decode the existing JSON array
+	if err = json.NewDecoder(file).Decode(&statusArray); err == nil && !os.IsNotExist(err) {
+		//if successful, append new entry
+		statusArray = append(statusArray, newEntry)
+		//now we clear old contents of status.json
+		err = os.Truncate(file.Name(), 0)
+		file.Close()
+		if err != nil {
+			//for some reason truncate errored
+			fmt.Printf("Failed to truncate file: %v\n", err)
+			return
+		}
+	} else {
+		//if there is error or file doesnt exist, start with new array
+		fmt.Printf("Warning: could not decode existing status.json: %v\n", err)
 		statusArray = []StatusMap{newEntry}
 	}
-	statusArray = append(statusArray, newEntry)
-	file, err := os.OpenFile("status.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	//err = os.Truncate(file.Name(), 0)
-	file.Close()
-	/*if err != nil {
-		//for some reason truncate errored
-		fmt.Printf("Failed to truncate file: %v\n", err)
-		return
-	}*/
-
-	//open file, encode new data to it
 	file, err = os.OpenFile("status.json", os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -106,7 +109,7 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeHandler(w http.ResponseWriter, r *http.Request) {
-	//name := r.FormValue("name")
+	name := r.FormValue("name")
 
 	//...
 
