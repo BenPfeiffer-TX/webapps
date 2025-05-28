@@ -71,20 +71,6 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	//err = os.Truncate(file.Name(), 0)
-	file.Close()
-	/*if err != nil {
-		//for some reason truncate errored
-		fmt.Printf("Failed to truncate file: %v\n", err)
-		return
-	}*/
-
-	//open file, encode new data to it
-	file, err = os.OpenFile("status.json", os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	defer file.Close()
 	//encode new data to status.json
 	if err = json.NewEncoder(file).Encode(statusArray); err != nil {
