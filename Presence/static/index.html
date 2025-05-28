@@ -16,11 +16,40 @@
     
     <div id="info" class="grid-container">
         {{range .StatusMap}}
-        <div class="status-box">
+	<div class="status-box {{if eq .Status "Available"}}available{{else if eq .Status "Busy"}}busy{{else if eq .Status "Away"}}away{{else if eq .Status "Offline"}}offline{{end}}">
             <h3>{{.Name}}</h3>
             <p>Status: {{.Status}}</p>
+	    <select onchange="updateStatus('{{.Name}}', this.value)">
+                <option value="Available" {{if eq .Status "Available"}}selected{{end}}>Available</option>
+                <option value="Busy" {{if eq .Status "Busy"}}selected{{end}}>Busy</option>
+                <option value="Away" {{if eq .Status "Away"}}selected{{end}}>Away</option>
+                <option value="Meeting" {{if eq .Status "Meeting"}}selected{{end}}>Meeting</option>
+                <option value="Offline" {{if eq .Status "Offline"}}selected{{end}}>Offline</option>
+            </select>
         </div>
         {{end}}
     </div>
+        <script>
+        function updateStatus(userId, status) {
+            fetch(`/update/${userId}/${status}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Name: userId, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Status updated successfully');
+                } else {
+                    console.error('Failed to update status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
 </body>
 </html>
