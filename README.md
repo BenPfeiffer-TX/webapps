@@ -9,6 +9,4 @@ In this public github repo I am storing my attempts at developing web applicatio
 [Presence](Presence)
 * an "at a glance" attendance viewer for the OpenText technical support team to track availability / current status of people more readily than when checking Teams
 
-## Project \#3: PfastChat
-* A chatroom with session persistence (gorilla/websocket), a simple authentication page, JSON marshalling for storing credentials, and chat persistence. Find some way to incorporate concurrency?
 
